@@ -199,7 +199,7 @@ Public Class CRD_List_Item
         HistoryDL_Pfad = DL_Pfad
         HistoryFilename = Filename
 
-        Dim exepath As String = Application.StartupPath + "\ffmpeg.exe"
+        Dim exepath As String = Application.StartupPath + "\ffmpeg\ffmpeg.exe"
         Dim startinfo As New System.Diagnostics.ProcessStartInfo
         'Dim cmd As String = "-i " + Chr(34) + URL_DL + Chr(34) + " -c copy -bsf:a aac_adtstoasc " + Pfad_DL 'start ffmpeg with command strFFCMD string
         Dim cmd As String = "-i " + Chr(34) + DL_URL + Chr(34) + " " + ffmpeg_command + " " + DL_Pfad 'start ffmpeg with command strFFCMD string

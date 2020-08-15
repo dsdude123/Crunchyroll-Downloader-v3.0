@@ -1,25 +1,19 @@
 ﻿Imports Microsoft.Win32
-Imports System.Net
 Imports Gecko
 Imports System.IO
+Imports Crunchyroll_Downloader.Common
+
 Public Class Anime_Add
     Public Mass_DL_Cancel As Boolean = False
     Public List_DL_Cancel As Boolean = False
 
-    Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
+    Private registryKey As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
+
+    Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles subfolderSelection.SelectedIndexChanged
         Try
-            If ComboBox2.Text = Main.SubFolder_Nothing Then
-                Dim rk As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-                rk.SetValue("SubFolder_Value", Main.SubFolder_Nothing, RegistryValueKind.String)
-            ElseIf ComboBox2.Text = Main.SubFolder_automatic Then
-                Dim rk As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-                rk.SetValue("SubFolder_Value", Main.SubFolder_automatic, RegistryValueKind.String)
-            Else
-                Dim rk As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-                rk.SetValue("SubFolder_Value", ComboBox2.Text, RegistryValueKind.String)
-            End If
+            registryKey.SetValue("SubFolder_Value", subfolderSelection.Text, RegistryValueKind.String)
         Catch ex As Exception
-            ComboBox2.Text = Main.SubFolder_Nothing
+            subfolderSelection.Text = Main.SubFolder_Nothing
         End Try
     End Sub
 
@@ -27,7 +21,7 @@ Public Class Anime_Add
         Me.Icon = My.Resources.icon
         Try
             For i As Integer = 0 To Main.ListBoxList.Count - 1
-                ListBox1.Items.Add(Main.ListBoxList.Item(i))
+                animeQueue.Items.Add(Main.ListBoxList.Item(i))
 
             Next
         Catch ex As Exception
@@ -39,42 +33,32 @@ Public Class Anime_Add
 
         End Try
         Me.Location = New Point(Main.Location.X + Main.Width / 2 - Me.Width / 2, Main.Location.Y + Main.Height / 2 - Me.Height / 2)
-        TextBox4.Text = Main.Pfad
+        Me.baseDirectoryTextBox.Text = Main.baseDirectory
 
         Dim SubFolder_Value As String
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SubFolder_Value = rkg.GetValue("SubFolder_Value").ToString
-            If SubFolder_Value = Main.SubFolder_Nothing Then
-                ComboBox2.Items.Add(Main.SubFolder_automatic)
-                ComboBox2.Items.Add(Main.SubFolder_Nothing)
-            ElseIf SubFolder_Value = Main.SubFolder_automatic Then
-                ComboBox2.Items.Add(Main.SubFolder_automatic)
-                ComboBox2.Items.Add(Main.SubFolder_Nothing)
-            Else
 
-                ComboBox2.Items.Add(Main.SubFolder_automatic)
-                ComboBox2.Items.Add(Main.SubFolder_Nothing)
-                ComboBox2.Items.Add(SubFolder_Value)
+        subfolderSelection.Items.Add(Main.SubFolder_automatic)
+        subfolderSelection.Items.Add(Main.SubFolder_Nothing)
+        Try
+            SubFolder_Value = registryKey.GetValue("SubFolder_Value").ToString
+
+            If (SubFolder_Value IsNot Main.SubFolder_Nothing) And (SubFolder_Value IsNot Main.SubFolder_automatic) Then
+                subfolderSelection.Items.Add(SubFolder_Value)
             End If
         Catch ex As Exception
-            ComboBox2.Items.Add(Main.SubFolder_automatic)
-            ComboBox2.Items.Add(Main.SubFolder_Nothing)
-            ComboBox2.SelectedItem = Main.SubFolder_Nothing
+            subfolderSelection.SelectedItem = Main.SubFolder_Nothing
             SubFolder_Value = Main.SubFolder_Nothing
         End Try
 
         Try
-            Dim di As New System.IO.DirectoryInfo(Main.Pfad)
-            For Each fi As System.IO.DirectoryInfo In di.EnumerateDirectories("*.*", System.IO.SearchOption.TopDirectoryOnly)
-                If fi.Attributes.HasFlag(System.IO.FileAttributes.Hidden) Then
-                Else
-                    ComboBox2.Items.Add(fi.Name)
+            For Each subDirectory In Main.baseDirectory.EnumerateDirectories("*.*", System.IO.SearchOption.TopDirectoryOnly)
+                If subDirectory.Attributes.HasFlag(System.IO.FileAttributes.Hidden) = False Then
+                    subfolderSelection.Items.Add(subDirectory.Name)
                 End If
             Next
             Dim Result As New List(Of String)
             'Jeder Eintrag in der Combobox durchgehen
-            For Each item As String In ComboBox2.Items
+            For Each item As String In subfolderSelection.Items
                 'Wenn der Combobox-Eintrag noch nicht in der Result-List vorhanden ist, Eintrag der Result-List hinzufügen
                 If Result.Contains(item) = False Then
                     Result.Add(item)
@@ -82,49 +66,33 @@ Public Class Anime_Add
             Next
             'In der Result-List sind jetzt alle Einträge einmal vorhanden
             'Combobox leeren
-            ComboBox2.Items.Clear()
+            subfolderSelection.Items.Clear()
             'Die Result-List der Combobox hinzufügen
-            ComboBox2.Items.AddRange(Result.ToArray)
-            ComboBox2.SelectedItem = SubFolder_Value
+            subfolderSelection.Items.AddRange(Result.ToArray)
+            subfolderSelection.SelectedItem = SubFolder_Value
         Catch ex As Exception
         End Try
     End Sub
 
-    Private Sub TextBox4_DoubleClick(sender As Object, e As EventArgs) Handles TextBox4.DoubleClick
-        'MsgBox(DL_Path_String, MsgBoxStyle.OkOnly)
+    Private Sub TextBox4_DoubleClick(sender As Object, e As EventArgs) Handles baseDirectoryTextBox.DoubleClick
         Dim FolderBrowserDialog1 As New FolderBrowserDialog()
 
         If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
-            ComboBox2.Items.Clear()
-            Main.Pfad = FolderBrowserDialog1.SelectedPath
-            Dim rk0 As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-            rk0.SetValue("Ordner", Main.Pfad, RegistryValueKind.String)
+            subfolderSelection.Items.Clear()
+            Main.baseDirectory = FolderBrowserDialog1.SelectedPath
+            registryKey.SetValue("Ordner", Main.baseDirectory, RegistryValueKind.String)
 
-            ComboBox2.Items.Add(Main.SubFolder_automatic)
-            ComboBox2.Items.Add(Main.SubFolder_Nothing)
-            ComboBox2.SelectedItem = Main.SubFolder_Nothing
-            TextBox4.Text = Main.Pfad
+            subfolderSelection.Items.Add(Main.SubFolder_automatic)
+            subfolderSelection.Items.Add(Main.SubFolder_Nothing)
+            subfolderSelection.SelectedItem = Main.SubFolder_Nothing
+            baseDirectoryTextBox.Text = Main.baseDirectory
             Try
-                Dim di As New System.IO.DirectoryInfo(Main.Pfad)
-                For Each fi As System.IO.DirectoryInfo In di.EnumerateDirectories("*.*", System.IO.SearchOption.TopDirectoryOnly)
-                    If fi.Attributes.HasFlag(System.IO.FileAttributes.Hidden) Then
+                For Each subDirectory As System.IO.DirectoryInfo In Main.baseDirectory.EnumerateDirectories("*.*", System.IO.SearchOption.TopDirectoryOnly)
+                    If subDirectory.Attributes.HasFlag(System.IO.FileAttributes.Hidden) Then
                     Else
-                        ComboBox2.Items.Add(fi.Name)
+                        subfolderSelection.Items.Add(subDirectory.Name)
                     End If
                 Next
-                Dim Result As New List(Of String)
-                'Jeder Eintrag in der Combobox durchgehen
-                For Each item As String In ComboBox2.Items
-                    'Wenn der Combobox-Eintrag noch nicht in der Result-List vorhanden ist, Eintrag der Result-List hinzufügen
-                    If Result.Contains(item) = False Then
-                        Result.Add(item)
-                    End If
-                Next
-                'In der Result-List sind jetzt alle Einträge einmal vorhanden
-                'Combobox leeren
-                'ComboBox2.Items.Clear()
-                'Die Result-List der Combobox hinzufügen
-                'ComboBox2.Items.AddRange(Result.ToArray)
             Catch ex As Exception
             End Try
         End If
@@ -171,131 +139,116 @@ Public Class Anime_Add
 
 
 #End Region
-    Private Sub PictureBox3_MouseEnter(sender As Object, e As EventArgs) Handles pictureBox3.MouseEnter
-        pictureBox3.BackColor = SystemColors.Control
+    Private Sub PictureBox3_MouseEnter(sender As Object, e As EventArgs) Handles closeButton.MouseEnter
+        closeButton.BackColor = SystemColors.Control
     End Sub
 
-    Private Sub PictureBox3_MouseLeave(sender As Object, e As EventArgs) Handles pictureBox3.MouseLeave
-        pictureBox3.BackColor = Color.Transparent
+    Private Sub PictureBox3_MouseLeave(sender As Object, e As EventArgs) Handles closeButton.MouseLeave
+        closeButton.BackColor = Color.Transparent
     End Sub
 
-    Private Sub PictureBox3_Click(sender As Object, e As EventArgs) Handles pictureBox3.Click
-        If ListBox1.Items.Count > 0 Then
+    Private Sub PictureBox3_Click(sender As Object, e As EventArgs) Handles closeButton.Click
+        If animeQueue.Items.Count > 0 Then
             Main.ListBoxList.Clear()
-            For i As Integer = 0 To ListBox1.Items.Count - 1
-                Main.ListBoxList.Add(ListBox1.Items.Item(i))
+            For i As Integer = 0 To animeQueue.Items.Count - 1
+                Main.ListBoxList.Add(animeQueue.Items.Item(i))
             Next
         End If
         Me.Close()
     End Sub
 
-    Private Sub PictureBox4_Click(sender As Object, e As EventArgs) Handles pictureBox4.Click
-        'pictureBox4.Enabled = False
-        Main.LoginOnly = "Download Mode!"
-        If groupBox1.Visible = True Then
+    Private Sub PictureBox4_Click(sender As Object, e As EventArgs) Handles downloadButton.Click
+        Main.LoginOnly = LoginMode.DOWNLOAD_MODE
+        If initialSettingsGroup.Visible = True Then
             Try
-                If CBool(InStr(textBox1.Text, "crunchyroll.com")) Or CBool(InStr(textBox1.Text, "funimation.com")) Then
+                If InStr(animeUrl.Text, "crunchyroll.com") Or InStr(animeUrl.Text, "funimation.com") Then
                     If StatusLabel.Text = "Status: waiting for episode selection" Then
                         If MessageBox.Show("Are you sure you want cancel the advanced download?", "confirm?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                             StatusLabel.Text = "Status: idle"
                         Else
                             Exit Sub
-                            pictureBox4.Enabled = True
                         End If
-                        'ElseIf LabelUpdate = "Status: looking for video file" Then
-                        '    Exit Sub
-                        '    pictureBox4.Enabled = True
                     Else
                         If Main.RunningDownloads >= Main.MaxDL Then
-                            ListBox1.Items.Add(textBox1.Text)
-                            textBox1.ForeColor = Color.FromArgb(9248044)
+                            animeQueue.Items.Add(animeUrl.Text)
+                            animeUrl.ForeColor = Color.FromArgb(9248044)
                             Main.Pause(1)
-                            textBox1.ForeColor = Color.Black
-                            textBox1.Text = "URL"
+                            animeUrl.ForeColor = Color.Black
+                            animeUrl.Text = "URL"
                         Else
                             If Main.Grapp_RDY = True Then
-                                GeckoFX.WebBrowser1.Navigate(textBox1.Text)
+                                GeckoFX.WebBrowser1.Navigate(animeUrl.Text)
                                 StatusLabel.Text = "Status: looking for video file"
                                 Main.b = False
                             End If
                         End If
                     End If
-                ElseIf CBool(InStr(textBox1.Text, "Test=true")) Then
-                    GeckoFX.WebBrowser1.Navigate(textBox1.Text)
-                Else 'If CBool(InStr(textBox1.Text, "vrv.co")) Then
-                    If MessageBox.Show("This in NOT a Crunchyroll URL, try anyway?", "confirm?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                ElseIf InStr(animeUrl.Text, "Test=true") Then
+                    GeckoFX.WebBrowser1.Navigate(animeUrl.Text)
+                Else
+                    If MessageBox.Show("This in NOT a Crunchyroll or Funimation URL, try anyway?", "confirm?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                         Dim FileLocation As DirectoryInfo = New DirectoryInfo(Application.StartupPath)
                         Dim CurrentFile As String = Nothing
-                        For Each File In FileLocation.GetFiles()
-                            If InStr(File.FullName, "gecko-network.txt") Then
-                                CurrentFile = File.FullName
-                                Exit For
-                            End If
-                        Next
-                        If CurrentFile = Nothing Then
-                        Else
-                            Dim logFileStream As FileStream = New FileStream(CurrentFile, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)
-                            Dim logFileReader As StreamReader = New StreamReader(logFileStream)
-                            logFileStream.SetLength(0)
-                            logFileReader.Close()
-                            logFileStream.Close()
+                        If File.Exists(Path.Combine(Application.StartupPath, "gecko-network.txt")) Then
+                            CurrentFile = Path.Combine(Application.StartupPath, "gecko-network.txt")
+                        End If
+
+
+                        If CurrentFile IsNot Nothing Then
+                            File.Delete(CurrentFile)
                         End If
                         Main.LogBrowserData = True
                         GeckoPreferences.Default("logging.config.LOG_FILE") = "gecko-network.txt"
                         GeckoPreferences.Default("logging.nsHttp") = 3
-                        GeckoFX.WebBrowser1.Navigate(textBox1.Text)
+                        GeckoFX.WebBrowser1.Navigate(animeUrl.Text)
                         StatusLabel.Text = "Status: looking for non CR video file"
                         Main.b = False
                     Else
                         Exit Sub
-                        pictureBox4.Enabled = True
                     End If
-
-                    'Else
-                    'MsgBox(Main.URL_Invaild, MsgBoxStyle.OkOnly)
                 End If
             Catch ex As Exception
                 'MsgBox(ex.ToString)
                 Main.b = True
                 MsgBox(Main.URL_Invaild, MsgBoxStyle.OkOnly)
             End Try
-        ElseIf groupBox2.Visible = True Then
+        ElseIf episodeSelectionGroup.Visible = True Then
             If Mass_DL_Cancel = True Then
                 Mass_DL_Cancel = False
                 GroupBox3.Visible = False
-                groupBox2.Visible = False
+                episodeSelectionGroup.Visible = False
                 Main.Grapp_Abord = True
                 Main.b = True
-                groupBox1.Visible = True
-                pictureBox4.Image = My.Resources.main_button_download_default
+                initialSettingsGroup.Visible = True
+                downloadButton.Image = My.Resources.main_button_download_default
             Else
                 StatusLabel.Text = "Status: idle"
-                pictureBox4.Image = My.Resources.add_mass_running_cancel
+                downloadButton.Image = My.Resources.add_mass_running_cancel
                 Mass_DL_Cancel = True
-                PictureBox1.Enabled = False
-                PictureBox1.Visible = False
+                cancelAddButton.Enabled = False
+                cancelAddButton.Visible = False
                 Main.MassDL()
-                comboBox4.Enabled = False
-                comboBox3.Enabled = False
-                ComboBox1.Enabled = False
+                lastEpisodeSelector.Enabled = False
+                firstEpisodeSelector.Enabled = False
+                seasonSelector.Enabled = False
             End If
         ElseIf GroupBox3.Visible = True Then
             GroupBox3.Visible = False
-            groupBox2.Visible = False
-            groupBox1.Visible = True
+            episodeSelectionGroup.Visible = False
+            initialSettingsGroup.Visible = True
             List_DL_Cancel = False
-            pictureBox4.Image = My.Resources.main_button_download_default
+            downloadButton.Image = My.Resources.main_button_download_default
         End If
         If InStr(My.Computer.Info.OSFullName, "Server") Then
             MsgBox("Windows Server is not supported!", MsgBoxStyle.Critical)
             Me.Close()
         End If
-        pictureBox4.Enabled = True
+        downloadButton.Enabled = True
     End Sub
 
 
 
-    Private Sub ComboBox1_DrawItem(sender As Object, e As DrawItemEventArgs) Handles ComboBox1.DrawItem, ComboBox2.DrawItem, comboBox3.DrawItem, comboBox4.DrawItem
+    Private Sub ComboBox1_DrawItem(sender As Object, e As DrawItemEventArgs) Handles seasonSelector.DrawItem, subfolderSelection.DrawItem, firstEpisodeSelector.DrawItem, lastEpisodeSelector.DrawItem
         sender.BackColor = Color.White
         If e.Index >= 0 Then
             Using st As New StringFormat With {.Alignment = StringAlignment.Center}
@@ -308,78 +261,73 @@ Public Class Anime_Add
         End If
     End Sub
 
-    Private Sub PictureBox4_MouseEnter(sender As Object, e As EventArgs) Handles pictureBox4.MouseEnter
+    Private Sub PictureBox4_MouseEnter(sender As Object, e As EventArgs) Handles downloadButton.MouseEnter
         If Mass_DL_Cancel = True Then
-            pictureBox4.Image = My.Resources.add_mass_running_cancel_hover
+            downloadButton.Image = My.Resources.add_mass_running_cancel_hover
         ElseIf List_DL_Cancel = True Then
-            pictureBox4.Image = My.Resources.add_mass_running_cancel_hover
+            downloadButton.Image = My.Resources.add_mass_running_cancel_hover
 
         Else
-            pictureBox4.Image = My.Resources.main_button_download_hovert
+            downloadButton.Image = My.Resources.main_button_download_hovert
         End If
 
     End Sub
 
-    Private Sub PictureBox4_MouseLeave(sender As Object, e As EventArgs) Handles pictureBox4.MouseLeave
+    Private Sub PictureBox4_MouseLeave(sender As Object, e As EventArgs) Handles downloadButton.MouseLeave
         If Mass_DL_Cancel = True Then
-            pictureBox4.Image = My.Resources.add_mass_running_cancel
+            downloadButton.Image = My.Resources.add_mass_running_cancel
         ElseIf List_DL_Cancel = True Then
-            pictureBox4.Image = My.Resources.add_mass_running_cancel
+            downloadButton.Image = My.Resources.add_mass_running_cancel
         Else
-            pictureBox4.Image = My.Resources.main_button_download_default
+            downloadButton.Image = My.Resources.main_button_download_default
         End If
 
     End Sub
 
-    Private Sub TextBox1_Click(sender As Object, e As EventArgs) Handles textBox1.Click
-        If textBox1.Text = "URL" Then
-            textBox1.Text = Nothing
+    Private Sub TextBox1_Click(sender As Object, e As EventArgs) Handles animeUrl.Click
+        If animeUrl.Text = "URL" Then
+            animeUrl.Text = Nothing
         End If
     End Sub
 
-    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
-        groupBox1.Visible = True
-        groupBox2.Visible = False
+    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles cancelAddButton.Click
+        initialSettingsGroup.Visible = True
+        episodeSelectionGroup.Visible = False
     End Sub
 
-    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
-        'MsgBox("Test")
-        comboBox3.Items.Clear()
-        comboBox4.Items.Clear()
-        'comboBox3.Items.Add("Test")
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles seasonSelector.SelectedIndexChanged
+        firstEpisodeSelector.Items.Clear()
+        lastEpisodeSelector.Items.Clear()
         Dim SeasonDropdownAnzahl As String() = Main.WebbrowserText.Split(New String() {"season-dropdown content-menu block"}, System.StringSplitOptions.RemoveEmptyEntries)
         Array.Reverse(SeasonDropdownAnzahl)
         Dim SDV As Integer = 0
         For i As Integer = 0 To SeasonDropdownAnzahl.Count - 1
-            If InStr(SeasonDropdownAnzahl(i), Chr(34) + ">" + ComboBox1.SelectedItem.ToString + "</a>") Then
+            If InStr(SeasonDropdownAnzahl(i), Chr(34) + ">" + seasonSelector.SelectedItem.ToString + "</a>") Then
                 SDV = i
             End If
         Next
-        'MsgBox(SDV)
         Dim Anzahl As String() = SeasonDropdownAnzahl(SDV).Split(New String() {"wrapper container-shadow hover-classes"}, System.StringSplitOptions.RemoveEmptyEntries)
-        'MsgBox(Anzahl(0))
-        Dim c As Integer = Anzahl.Count - 1
         Array.Reverse(Anzahl)
         For i As Integer = 0 To Anzahl.Count - 2
             Dim URLGrapp As String() = Anzahl(i).Split(New String() {"title=" + Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
 
             Dim URLGrapp2 As String() = URLGrapp(1).Split(New String() {Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
 
-            comboBox3.Items.Add(URLGrapp2(0))
-            comboBox4.Items.Add(URLGrapp2(0))
+            firstEpisodeSelector.Items.Add(URLGrapp2(0))
+            lastEpisodeSelector.Items.Add(URLGrapp2(0))
         Next
     End Sub
 
-    Private Sub PictureBox1_MouseEnter(sender As Object, e As EventArgs) Handles PictureBox1.MouseEnter
-        PictureBox1.Image = My.Resources.add_mass_cancel_hover
+    Private Sub PictureBox1_MouseEnter(sender As Object, e As EventArgs) Handles cancelAddButton.MouseEnter
+        cancelAddButton.Image = My.Resources.add_mass_cancel_hover
     End Sub
 
-    Private Sub PictureBox1_MouseLeave(sender As Object, e As EventArgs) Handles PictureBox1.MouseLeave
-        PictureBox1.Image = My.Resources.add_mass_cancel
+    Private Sub PictureBox1_MouseLeave(sender As Object, e As EventArgs) Handles cancelAddButton.MouseLeave
+        cancelAddButton.Image = My.Resources.add_mass_cancel
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If ListBox1.Items.Count > 0 Then
+        If animeQueue.Items.Count > 0 Then
             If StatusLabel.Text = "Status: idle" Then
                 StatusLabel.Text = "Status: items in queue, click to work off."
             End If
@@ -390,67 +338,55 @@ Public Class Anime_Add
 #Region "Listbox"
 
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        If GroupBox3.Visible = True Then
-            If ListBox1.Items.Count = 0 Then
-                GroupBox3.Visible = False
-                groupBox2.Visible = False
-                groupBox1.Visible = True
-                List_DL_Cancel = False
-                pictureBox4.Image = My.Resources.main_button_download_default
-            End If
+        If (GroupBox3.Visible = True) And (animeQueue.Items.Count = 0) Then
+            GroupBox3.Visible = False
+            episodeSelectionGroup.Visible = False
+            initialSettingsGroup.Visible = True
+            List_DL_Cancel = False
+            downloadButton.Image = My.Resources.main_button_download_default
         End If
-        If Main.RunningDownloads < Main.MaxDL Then
-            If ListBox1.Items.Count > 0 Then
-                If GroupBox3.Visible = True Then
-                    If InStr(ListBox1.GetItemText(ListBox1.Items(0)), "funimation.com") Then
-                        If Main.Funimation_Grapp_RDY = True Then
-                            GeckoFX.WebBrowser1.Navigate(ListBox1.GetItemText(ListBox1.Items(0)))
-                            ListBox1.Items.Remove(ListBox1.Items(0))
-                            Main.Funimation_Grapp_RDY = False
-                            Main.b = False
-                        End If
-
-                    Else
-                        If Main.Grapp_RDY = True Then
-                            GeckoFX.WebBrowser1.Navigate(ListBox1.GetItemText(ListBox1.Items(0)))
-                            ListBox1.Items.Remove(ListBox1.Items(0))
-                            Main.Grapp_RDY = False
-                            Main.b = False
-                        End If
-                    End If
+        If (Main.RunningDownloads < Main.MaxDL) And (animeQueue.Items.Count > 0) And (GroupBox3.Visible = True) Then
+            If InStr(animeQueue.GetItemText(animeQueue.Items(0)), "funimation.com") Then
+                If Main.Funimation_Grapp_RDY = True Then
+                    GeckoFX.WebBrowser1.Navigate(animeQueue.GetItemText(animeQueue.Items(0)))
+                    animeQueue.Items.Remove(animeQueue.Items(0))
+                    Main.Funimation_Grapp_RDY = False
+                    Main.b = False
                 End If
 
-
+            Else
+                If Main.Grapp_RDY = True Then
+                    GeckoFX.WebBrowser1.Navigate(animeQueue.GetItemText(animeQueue.Items(0)))
+                    animeQueue.Items.Remove(animeQueue.Items(0))
+                    Main.Grapp_RDY = False
+                    Main.b = False
+                End If
             End If
         End If
 
     End Sub
     Private Sub StatusLabel_Click(sender As Object, e As EventArgs) Handles StatusLabel.Click
         If StatusLabel.Text = "Status: items in queue, click to work off." Then
-            groupBox1.Visible = False
-            groupBox2.Visible = False
+            initialSettingsGroup.Visible = False
+            episodeSelectionGroup.Visible = False
             GroupBox3.Visible = True
-            pictureBox4.Image = My.Resources.add_mass_running_cancel
+            downloadButton.Image = My.Resources.add_mass_running_cancel
             List_DL_Cancel = True
         End If
 
     End Sub
 
 
-    Private Sub TextBox2_Click(sender As Object, e As EventArgs) Handles textBox2.Click
-        If textBox2.Text = "Name of the Anime" Then
-            textBox2.Text = Nothing
+    Private Sub TextBox2_Click(sender As Object, e As EventArgs) Handles animeName.Click
+        If animeName.Text = "Name of the Anime" Then
+            animeName.Text = Nothing
         End If
     End Sub
 
 
-    Private Sub ListBox1_DoubleClick(sender As Object, e As EventArgs) Handles ListBox1.DoubleClick
-        ListBox1.Items.Remove(ListBox1.SelectedItem)
+    Private Sub ListBox1_DoubleClick(sender As Object, e As EventArgs) Handles animeQueue.DoubleClick
+        animeQueue.Items.Remove(animeQueue.SelectedItem)
     End Sub
-
-
-
-
 #End Region
 
 End Class

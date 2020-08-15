@@ -3,6 +3,8 @@ Imports System.Text
 Imports System.IO
 Imports Microsoft.Win32
 Imports System.ComponentModel
+Imports Crunchyroll_Downloader.Common
+
 Public Class Main
     Public ListBoxList As New List(Of String)
     Dim ItemList As New List(Of CRD_List_Item)
@@ -33,8 +35,8 @@ Public Class Main
     Public b As Boolean = True
     Public c As Boolean = True
     Public d As Boolean = True
-    Public LoginOnly As String = "False"
-    Public Pfad As String = My.Computer.FileSystem.CurrentDirectory
+    Public LoginOnly As LoginMode
+    Public baseDirectory = My.Computer.FileSystem.CurrentDirectory
     Public ffmpeg_command As String = " -c copy -bsf:a aac_adtstoasc" '" -c:v hevc_nvenc -preset fast -b:v 6M -bsf:a aac_adtstoasc " 
     Public Resu As Integer
     Dim Resu2 As String
@@ -167,7 +169,7 @@ Public Class Main
 
         Try
             Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            Pfad = rkg.GetValue("Ordner").ToString
+            baseDirectory = rkg.GetValue("Ordner").ToString
         Catch ex As Exception
 
         End Try
@@ -378,7 +380,7 @@ Public Class Main
         'Item.SetLocations(r.Y)
         'MsgBox("test " + r.Y.ToString)
         Item.Visible = True
-        Item.DownloadMangaPages(Pfad, BaseURL, SiteList, NameP2)
+        Item.DownloadMangaPages(baseDirectory, BaseURL, SiteList, NameP2)
     End Sub
 #End Region
     Public Sub Pause(ByVal pau As Single)
@@ -398,16 +400,16 @@ Public Class Main
 #Region "Season DL"
 
     Public Sub MassGrapp()
-        Anime_Add.groupBox2.Visible = True
-        Anime_Add.PictureBox1.Enabled = True
-        Anime_Add.PictureBox1.Visible = True
-        Anime_Add.groupBox1.Visible = False
-        Anime_Add.ComboBox1.Items.Clear()
-        Anime_Add.comboBox3.Items.Clear()
-        Anime_Add.comboBox4.Items.Clear()
-        Anime_Add.ComboBox1.Enabled = False
-        Anime_Add.comboBox3.Enabled = True
-        Anime_Add.comboBox4.Enabled = True
+        Anime_Add.episodeSelectionGroup.Visible = True
+        Anime_Add.cancelAddButton.Enabled = True
+        Anime_Add.cancelAddButton.Visible = True
+        Anime_Add.initialSettingsGroup.Visible = False
+        Anime_Add.seasonSelector.Items.Clear()
+        Anime_Add.firstEpisodeSelector.Items.Clear()
+        Anime_Add.lastEpisodeSelector.Items.Clear()
+        Anime_Add.seasonSelector.Enabled = False
+        Anime_Add.firstEpisodeSelector.Enabled = True
+        Anime_Add.lastEpisodeSelector.Enabled = True
         Dim Anzahl As String() = WebbrowserText.Split(New String() {"wrapper container-shadow hover-classes"}, System.StringSplitOptions.RemoveEmptyEntries)
         Dim Titel As String() = Anzahl(0).Split(New String() {"<meta content=" + Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
         Dim Titel2 As String() = Titel(1).Split(New String() {Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
@@ -422,48 +424,48 @@ Public Class Main
 
             Dim URLGrapp2 As String() = URLGrapp(1).Split(New String() {Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
 
-            Anime_Add.comboBox3.Items.Add(URLGrapp2(0))
-            Anime_Add.comboBox4.Items.Add(URLGrapp2(0))
+            Anime_Add.firstEpisodeSelector.Items.Add(URLGrapp2(0))
+            Anime_Add.lastEpisodeSelector.Items.Add(URLGrapp2(0))
         Next
 
     End Sub
 
     Public Sub SeasonDropdownGrapp()
 
-        Anime_Add.groupBox2.Visible = True
-        Anime_Add.PictureBox1.Enabled = True
-        Anime_Add.PictureBox1.Visible = True
-        Anime_Add.groupBox1.Visible = False
-        Anime_Add.ComboBox1.Items.Clear()
-        Anime_Add.comboBox3.Items.Clear()
-        Anime_Add.comboBox4.Items.Clear()
-        Anime_Add.ComboBox1.Enabled = True
-        Anime_Add.comboBox3.Enabled = True
-        Anime_Add.comboBox4.Enabled = True
+        Anime_Add.episodeSelectionGroup.Visible = True
+        Anime_Add.cancelAddButton.Enabled = True
+        Anime_Add.cancelAddButton.Visible = True
+        Anime_Add.initialSettingsGroup.Visible = False
+        Anime_Add.seasonSelector.Items.Clear()
+        Anime_Add.firstEpisodeSelector.Items.Clear()
+        Anime_Add.lastEpisodeSelector.Items.Clear()
+        Anime_Add.seasonSelector.Enabled = True
+        Anime_Add.firstEpisodeSelector.Enabled = True
+        Anime_Add.lastEpisodeSelector.Enabled = True
         Dim Anzahl As String() = WebbrowserText.Split(New String() {"season-dropdown content-menu block"}, System.StringSplitOptions.RemoveEmptyEntries)
         Array.Reverse(Anzahl)
         For i As Integer = 0 To Anzahl.Count - 2
             Dim Titel As String() = Anzahl(i).Split(New String() {"</a>"}, System.StringSplitOptions.RemoveEmptyEntries)
             Dim Titel2 As String() = Titel(0).Split(New String() {">"}, System.StringSplitOptions.RemoveEmptyEntries)
             'MsgBox(Titel2(0))
-            Anime_Add.ComboBox1.Items.Add(Titel2(1))
+            Anime_Add.seasonSelector.Items.Add(Titel2(1))
         Next
 
     End Sub
 
     Public Async Sub MassDL()
-        If Anime_Add.comboBox3.Text = Nothing Then
+        If Anime_Add.firstEpisodeSelector.Text = Nothing Then
             Exit Sub
         End If
         Anime_Add.Add_Display.Text = "preparing ..."
         Dim Website As String = WebbrowserText
 
-        If Anime_Add.ComboBox1.Enabled = True Then
+        If Anime_Add.seasonSelector.Enabled = True Then
             Dim SeasonDropdownAnzahl As String() = Website.Split(New String() {"season-dropdown content-menu block"}, System.StringSplitOptions.RemoveEmptyEntries)
             Array.Reverse(SeasonDropdownAnzahl)
             Dim SDV As Integer = 0
             For i As Integer = 0 To SeasonDropdownAnzahl.Count - 1
-                If InStr(SeasonDropdownAnzahl(i), Chr(34) + ">" + Anime_Add.ComboBox1.SelectedItem.ToString + "</a>") Then
+                If InStr(SeasonDropdownAnzahl(i), Chr(34) + ">" + Anime_Add.seasonSelector.SelectedItem.ToString + "</a>") Then
                     SDV = i
                 End If
             Next
@@ -474,17 +476,17 @@ Public Class Main
             Array.Reverse(Anzahl)
             Dim c As Integer = 0
             Aktuell = "0"
-            If Anime_Add.comboBox4.SelectedIndex > Anime_Add.comboBox3.SelectedIndex Or Anime_Add.comboBox4.SelectedIndex = Anime_Add.comboBox3.SelectedIndex Then
-                c = Anime_Add.comboBox4.SelectedIndex - Anime_Add.comboBox3.SelectedIndex + 1
+            If Anime_Add.lastEpisodeSelector.SelectedIndex > Anime_Add.firstEpisodeSelector.SelectedIndex Or Anime_Add.lastEpisodeSelector.SelectedIndex = Anime_Add.firstEpisodeSelector.SelectedIndex Then
+                c = Anime_Add.lastEpisodeSelector.SelectedIndex - Anime_Add.firstEpisodeSelector.SelectedIndex + 1
             Else
-                Dim TempCB3 As Integer = Anime_Add.comboBox3.SelectedIndex
-                Dim TempCB4 As Integer = Anime_Add.comboBox4.SelectedIndex
-                Anime_Add.comboBox3.SelectedIndex = TempCB4
-                Anime_Add.comboBox4.SelectedIndex = TempCB3
-                c = Anime_Add.comboBox4.SelectedIndex - Anime_Add.comboBox3.SelectedIndex + 1
+                Dim TempCB3 As Integer = Anime_Add.firstEpisodeSelector.SelectedIndex
+                Dim TempCB4 As Integer = Anime_Add.lastEpisodeSelector.SelectedIndex
+                Anime_Add.firstEpisodeSelector.SelectedIndex = TempCB4
+                Anime_Add.lastEpisodeSelector.SelectedIndex = TempCB3
+                c = Anime_Add.lastEpisodeSelector.SelectedIndex - Anime_Add.firstEpisodeSelector.SelectedIndex + 1
             End If
             Gesamt = c.ToString
-            For i As Integer = Anime_Add.comboBox3.SelectedIndex To Anime_Add.comboBox4.SelectedIndex
+            For i As Integer = Anime_Add.firstEpisodeSelector.SelectedIndex To Anime_Add.lastEpisodeSelector.SelectedIndex
 
                 For e As Integer = 0 To Integer.MaxValue
                     'FontLabel.Visible = True
@@ -506,14 +508,14 @@ Public Class Main
                     Grapp_Abord = True
                     'MsgBox("dl_abourd")
                 End If
-                Dim d As Integer = i - Anime_Add.comboBox3.SelectedIndex + 1
+                Dim d As Integer = i - Anime_Add.firstEpisodeSelector.SelectedIndex + 1
                 Dim URLGrapp As String() = Anzahl(i).Split(New String() {"<a href=" + Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
                 Dim URLGrapp2 As String() = URLGrapp(1).Split(New String() {Chr(34)}, System.StringSplitOptions.RemoveEmptyEntries)
                 If Debug2 = True Then
                     MsgBox("https://www.crunchyroll.com" + URLGrapp2(0))
                 End If
                 If UseQueue = True Then
-                    Anime_Add.ListBox1.Items.Add("https://www.crunchyroll.com" + URLGrapp2(0))
+                    Anime_Add.animeQueue.Items.Add("https://www.crunchyroll.com" + URLGrapp2(0))
                     Anime_Add.Add_Display.ForeColor = Color.FromArgb(9248044)
                     Pause(1)
                     Anime_Add.Add_Display.ForeColor = Color.Black
@@ -533,23 +535,23 @@ Public Class Main
             If Debug2 = True Then
                 MsgBox(ex.ToString)
             End If
-            Anime_Add.comboBox4.Items.Clear()
-            Anime_Add.comboBox3.Items.Clear()
+            Anime_Add.lastEpisodeSelector.Items.Clear()
+            Anime_Add.firstEpisodeSelector.Items.Clear()
             Aktuell = 0.ToString
             Gesamt = 0.ToString
 
-            Anime_Add.groupBox1.Visible = True
-            Anime_Add.groupBox2.Visible = False
+            Anime_Add.initialSettingsGroup.Visible = True
+            Anime_Add.episodeSelectionGroup.Visible = False
             Anime_Add.GroupBox3.Visible = False
             Anime_Add.Mass_DL_Cancel = False
-            Anime_Add.pictureBox4.Image = My.Resources.main_button_download_default
+            Anime_Add.downloadButton.Image = My.Resources.main_button_download_default
         End Try
         Pause(5)
-        Anime_Add.groupBox1.Visible = True
-        Anime_Add.groupBox2.Visible = False
+        Anime_Add.initialSettingsGroup.Visible = True
+        Anime_Add.episodeSelectionGroup.Visible = False
         Anime_Add.GroupBox3.Visible = False
         Anime_Add.Mass_DL_Cancel = False
-        Anime_Add.pictureBox4.Image = My.Resources.main_button_download_default
+        Anime_Add.downloadButton.Image = My.Resources.main_button_download_default
     End Sub
 #End Region
 
@@ -674,9 +676,9 @@ Public Class Main
         CR_FilenName = RemoveExtraSpaces(CR_FilenName)
 
         If SubfolderValue = Nothing Then
-            Pfad2 = Pfad + "\" + CR_FilenName + ".mp4"
+            Pfad2 = baseDirectory + "\" + CR_FilenName + ".mp4"
         Else
-            Pfad2 = Pfad + "\" + SubfolderValue + CR_FilenName + ".mp4"
+            Pfad2 = baseDirectory + "\" + SubfolderValue + CR_FilenName + ".mp4"
         End If
         If Not Directory.Exists(Path.GetDirectoryName(Pfad2)) Then
             ' Nein! Jetzt erstellen...
@@ -684,7 +686,7 @@ Public Class Main
                 Directory.CreateDirectory(Path.GetDirectoryName(Pfad2))
             Catch ex As Exception
                 ' Ordner wurde nich erstellt
-                Pfad2 = Pfad + "\" + CR_FilenName_Backup + ".mp4"
+                Pfad2 = baseDirectory + "\" + CR_FilenName_Backup + ".mp4"
             End Try
         End If
         Pfad2 = Chr(34) + Pfad2 + Chr(34)
@@ -857,25 +859,25 @@ Public Class Main
 
             End If
         Catch ex As Exception
-            Anime_Add.comboBox4.Items.Clear()
-            Anime_Add.comboBox3.Items.Clear()
+            Anime_Add.lastEpisodeSelector.Items.Clear()
+            Anime_Add.firstEpisodeSelector.Items.Clear()
             ' MsgBox(Error_Mass_DL, MsgBoxStyle.Information)
             'MsgBox(ex.ToString)
             Aktuell = 0.ToString
             Gesamt = 0.ToString
 
-            Anime_Add.groupBox1.Visible = True
-            Anime_Add.groupBox2.Visible = False
+            Anime_Add.initialSettingsGroup.Visible = True
+            Anime_Add.episodeSelectionGroup.Visible = False
             Anime_Add.GroupBox3.Visible = False
             Anime_Add.Mass_DL_Cancel = False
-            Anime_Add.pictureBox4.Image = My.Resources.main_button_download_default
+            Anime_Add.downloadButton.Image = My.Resources.main_button_download_default
         End Try
         Pause(5)
-        Anime_Add.groupBox1.Visible = True
-        Anime_Add.groupBox2.Visible = False
+        Anime_Add.initialSettingsGroup.Visible = True
+        Anime_Add.episodeSelectionGroup.Visible = False
         Anime_Add.GroupBox3.Visible = False
         Anime_Add.Mass_DL_Cancel = False
-        Anime_Add.pictureBox4.Image = My.Resources.main_button_download_default
+        Anime_Add.downloadButton.Image = My.Resources.main_button_download_default
     End Sub
 #End Region
 
@@ -1069,7 +1071,7 @@ Public Class Main
             Dim CR_FilenName_Backup As String = Nothing
 
             Me.Invoke(New Action(Function()
-                                     TextBox2_Text = Anime_Add.textBox2.Text
+                                     TextBox2_Text = Anime_Add.animeName.Text
                                      Return Nothing
                                  End Function))
 #Region "Name von Crunchyroll"
@@ -1082,13 +1084,13 @@ Public Class Main
                 Dim CR_Title As String = Nothing
                 'If CR_Name_by_Titel_2.Count > 2 Then
                 For i As Integer = 0 To CR_Name_by_Titel_2.Count - 2
-                        If CR_Title = Nothing Then
-                            CR_Title = CR_Name_by_Titel_2(i).Trim()
-                        Else
-                            CR_Title = CR_Title + " " + CR_Name_by_Titel_2(i).Trim()
-                        End If
+                    If CR_Title = Nothing Then
+                        CR_Title = CR_Name_by_Titel_2(i).Trim()
+                    Else
+                        CR_Title = CR_Title + " " + CR_Name_by_Titel_2(i).Trim()
+                    End If
 
-                    Next
+                Next
                 'Else
 
                 'End If
@@ -1130,11 +1132,11 @@ Public Class Main
 
             Else
                 Me.Invoke(New Action(Function()
-                                         If Anime_Add.ComboBox2.Text = SubFolder_automatic Then
+                                         If Anime_Add.subfolderSelection.Text = SubFolder_automatic Then
                                              MsgBox(SubFolder_automatic + " is not working with a costum name", MsgBoxStyle.Information)
-                                         ElseIf Anime_Add.ComboBox2.Text = SubFolder_Nothing Then
+                                         ElseIf Anime_Add.subfolderSelection.Text = SubFolder_Nothing Then
                                          Else
-                                             SubfolderValue = Anime_Add.ComboBox2.Text + "\"
+                                             SubfolderValue = Anime_Add.subfolderSelection.Text + "\"
                                          End If
                                          Return Nothing
                                      End Function))
@@ -1143,15 +1145,15 @@ Public Class Main
                 CR_FilenName_Backup = CR_FilenName
             End If
             Me.Invoke(New Action(Function()
-                                     If Anime_Add.ComboBox2.Text = SubFolder_automatic Then
+                                     If Anime_Add.subfolderSelection.Text = SubFolder_automatic Then
                                          If SubFolder = 2 Then
                                              SubfolderValue = CR_Anime_Titel + "\" + CR_Anime_Staffel + "\"
                                          ElseIf SubFolder = 1 Then
                                              SubfolderValue = CR_Anime_Titel + "\"
                                          End If
-                                     ElseIf Anime_Add.ComboBox2.Text = SubFolder_Nothing Then
+                                     ElseIf Anime_Add.subfolderSelection.Text = SubFolder_Nothing Then
                                      Else
-                                         SubfolderValue = Anime_Add.ComboBox2.Text + "\"
+                                         SubfolderValue = Anime_Add.subfolderSelection.Text + "\"
                                      End If
                                      Return Nothing
                                  End Function))
@@ -1160,9 +1162,9 @@ Public Class Main
             CR_FilenName = RemoveExtraSpaces(CR_FilenName)
             'MsgBox(CR_FilenName)
             If SubfolderValue = Nothing Then
-                Pfad2 = Pfad + "\" + CR_FilenName + ".mp4"
+                Pfad2 = baseDirectory + "\" + CR_FilenName + ".mp4"
             Else
-                Pfad2 = Pfad + "\" + SubfolderValue + CR_FilenName + ".mp4"
+                Pfad2 = baseDirectory + "\" + SubfolderValue + CR_FilenName + ".mp4"
             End If
             If Not Directory.Exists(Path.GetDirectoryName(Pfad2)) Then
                 ' Nein! Jetzt erstellen...
@@ -1170,7 +1172,7 @@ Public Class Main
                     Directory.CreateDirectory(Path.GetDirectoryName(Pfad2))
                 Catch ex As Exception
                     ' Ordner wurde nich erstellt
-                    Pfad2 = Pfad + "\" + CR_FilenName_Backup + ".mp4"
+                    Pfad2 = baseDirectory + "\" + CR_FilenName_Backup + ".mp4"
                 End Try
             End If
             Pfad2 = Chr(34) + Pfad2 + Chr(34)
@@ -1643,7 +1645,7 @@ Public Class Main
     Public Sub FFMPEG_Reso(ByVal DL_URL As String)
         ResoSearchRunning = True
         Dim proc As New Process
-        Dim exepath As String = Application.StartupPath + "\ffmpeg.exe"
+        Dim exepath As String = Application.StartupPath + "\ffmpeg\ffmpeg.exe"
         Dim startinfo As New System.Diagnostics.ProcessStartInfo
 
         Dim cmd As String = "-i " + Chr(34) + DL_URL + Chr(34) 'start ffmpeg with command strFFCMD string
@@ -1737,7 +1739,7 @@ Public Class Main
 
 #Region "lösche doppel download"
 
-        Dim Pfad5 As String = Path.Combine(Pfad + Video_FilenName)
+        Dim Pfad5 As String = Path.Combine(baseDirectory + Video_FilenName)
         If My.Computer.FileSystem.FileExists(Pfad5) Then 'Pfad = Kompeltter Pfad mit Dateinamen + ENdung
             If MessageBox.Show("The file " + Pfad5 + " already exists." + vbNewLine + "You want to override it?", "File exists!", MessageBoxButtons.OKCancel) = DialogResult.OK Then
                 Try
@@ -1771,7 +1773,7 @@ Public Class Main
         Dim L2Name As String = Video_Title
         Dim L1Name_Split As String() = WebbrowserURL.Split(New String() {"/"}, System.StringSplitOptions.RemoveEmptyEntries)
         Dim L1Name As String = L1Name_Split(1)
-        Pfad_DL = Chr(34) + Pfad + "\" + Video_FilenName + Chr(34)
+        Pfad_DL = Chr(34) + baseDirectory + "\" + Video_FilenName + Chr(34)
         Me.Invoke(New Action(Function()
                                  ListItemAdd(Pfad_DL, L1Name, L2Name, ResoHTMLDisplay, Subsprache3, SubValuesToDisplay(), thumbnail4, URL_DL, Pfad_DL)
                                  Return Nothing
@@ -1840,7 +1842,7 @@ Public Class Main
             Dim FunimationName3 As String = FunimationName2(FunimationName2.Count - 1).Replace("</a>", "")
             FunimationName3 = System.Text.RegularExpressions.Regex.Replace(FunimationName3, "[^\w\\-]", " ")
             FunimationName3 = RemoveExtraSpaces(FunimationName3)
-            Dim DownloadPfad As String = Chr(34) + Pfad + "\" + FunimationName3 + ".mp4" + Chr(34)
+            Dim DownloadPfad As String = Chr(34) + baseDirectory + "\" + FunimationName3 + ".mp4" + Chr(34)
 #End Region
 
 #Region "m3u8 URL"

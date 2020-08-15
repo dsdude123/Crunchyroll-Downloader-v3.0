@@ -8,6 +8,7 @@ Imports System.Net
 Imports System.Net.WebUtility
 Imports System.IO.Compression
 Imports System.Text
+Imports Crunchyroll_Downloader.Common
 
 Public Class GeckoFX
     Public keks As String = Nothing
@@ -23,11 +24,11 @@ Public Class GeckoFX
         If ScanTrue = False Then
             Button2.Enabled = True
         End If
-        If Main.LoginOnly = "US_UnBlock" Then
-            Main.LoginOnly = "US_UnBlock_Wait"
+        If Main.LoginOnly = LoginMode.US_UNBLOCK Then
+            Main.LoginOnly = LoginMode.US_UNBLOCK_WAIT
             If CBool(InStr(WebBrowser1.Document.Body.OuterHtml, "waiting for reCAPTCHA . . .")) Then
                 Main.Pause(4)
-                Main.LoginOnly = "US_UnBlock"
+                Main.LoginOnly = LoginMode.US_UNBLOCK
             Else
 
                 Dim cookieGrapp As String = WebBrowser1.Document.Body.OuterHtml '.Replace(vbTab, "").Replace(" ", "")
@@ -106,7 +107,7 @@ Public Class GeckoFX
 
                         ElseIf CBool(InStr(WebBrowser1.Document.Body.OuterHtml, "season-dropdown content-menu block")) Then
                             Main.b = True
-                            Anime_Add.textBox2.Text = "Name of the Anime"
+                            Anime_Add.animeName.Text = "Name of the Anime"
                             Main.WebbrowserURL = WebBrowser1.Url.ToString
                             Main.WebbrowserText = WebBrowser1.Document.Body.OuterHtml
                             Main.WebbrowserTitle = WebBrowser1.DocumentTitle
@@ -119,7 +120,7 @@ Public Class GeckoFX
                             End If
                         ElseIf CBool(InStr(WebBrowser1.Document.Body.OuterHtml, "wrapper container-shadow hover-classes")) Then
                             Main.b = True
-                            Anime_Add.textBox2.Text = "Name of the Anime"
+                            Anime_Add.animeName.Text = "Name of the Anime"
                             Main.WebbrowserURL = WebBrowser1.Url.ToString
                             Main.WebbrowserText = WebBrowser1.Document.Body.OuterHtml
                             Main.WebbrowserTitle = WebBrowser1.DocumentTitle
@@ -346,7 +347,7 @@ Public Class GeckoFX
         End If
 
         If WebBrowser1.Url.ToString = "about:blank" Then
-            If Main.LoginOnly = "US_UnBlock" Then
+            If Main.LoginOnly = LoginMode.US_UNBLOCK Then
                 WebBrowser1.Navigate("https://www.crunchyroll.com/login")
             Else
                 WebBrowser1.Navigate(Main.Startseite)

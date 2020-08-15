@@ -3,6 +3,7 @@ Imports Microsoft.Win32
 Imports System.Net
 Imports System.IO
 Imports System.Text
+Imports Crunchyroll_Downloader.Common
 
 Public Class einstellungen
     Private Sub einstellungen_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -558,7 +559,7 @@ Public Class einstellungen
 
     Private Sub PictureBox2_Click(sender As Object, e As EventArgs) Handles PictureBox2.Click
         GeckoFX.Show()
-        Main.LoginOnly = "US_UnBlock"
+        Main.LoginOnly = LoginMode.US_UNBLOCK
 
         GeckoFX.WebBrowser1.Navigate("https://api.criater-stiftung.org/cr-cookie-ui.php")
     End Sub

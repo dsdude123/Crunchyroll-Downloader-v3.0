@@ -23,45 +23,45 @@ Partial Class Anime_Add
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Me.groupBox1 = New System.Windows.Forms.GroupBox()
+        Me.initialSettingsGroup = New System.Windows.Forms.GroupBox()
         Me.StatusLabel = New System.Windows.Forms.Label()
-        Me.ComboBox2 = New System.Windows.Forms.ComboBox()
-        Me.TextBox4 = New System.Windows.Forms.TextBox()
-        Me.textBox1 = New System.Windows.Forms.TextBox()
-        Me.textBox2 = New System.Windows.Forms.TextBox()
-        Me.pictureBox4 = New System.Windows.Forms.PictureBox()
-        Me.pictureBox3 = New System.Windows.Forms.PictureBox()
-        Me.groupBox2 = New System.Windows.Forms.GroupBox()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.subfolderSelection = New System.Windows.Forms.ComboBox()
+        Me.baseDirectoryTextBox = New System.Windows.Forms.TextBox()
+        Me.animeUrl = New System.Windows.Forms.TextBox()
+        Me.animeName = New System.Windows.Forms.TextBox()
+        Me.downloadButton = New System.Windows.Forms.PictureBox()
+        Me.closeButton = New System.Windows.Forms.PictureBox()
+        Me.episodeSelectionGroup = New System.Windows.Forms.GroupBox()
+        Me.cancelAddButton = New System.Windows.Forms.PictureBox()
         Me.Add_Display = New System.Windows.Forms.Label()
-        Me.comboBox4 = New System.Windows.Forms.ComboBox()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        Me.comboBox3 = New System.Windows.Forms.ComboBox()
+        Me.lastEpisodeSelector = New System.Windows.Forms.ComboBox()
+        Me.seasonSelector = New System.Windows.Forms.ComboBox()
+        Me.firstEpisodeSelector = New System.Windows.Forms.ComboBox()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.ListBox1 = New System.Windows.Forms.ListBox()
+        Me.animeQueue = New System.Windows.Forms.ListBox()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
-        Me.groupBox1.SuspendLayout()
-        CType(Me.pictureBox4, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.pictureBox3, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.groupBox2.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.initialSettingsGroup.SuspendLayout()
+        CType(Me.downloadButton, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.closeButton, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.episodeSelectionGroup.SuspendLayout()
+        CType(Me.cancelAddButton, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'groupBox1
         '
-        Me.groupBox1.BackColor = System.Drawing.Color.Transparent
-        Me.groupBox1.Controls.Add(Me.StatusLabel)
-        Me.groupBox1.Controls.Add(Me.ComboBox2)
-        Me.groupBox1.Controls.Add(Me.TextBox4)
-        Me.groupBox1.Controls.Add(Me.textBox1)
-        Me.groupBox1.Controls.Add(Me.textBox2)
-        Me.groupBox1.Location = New System.Drawing.Point(5, 45)
-        Me.groupBox1.Name = "groupBox1"
-        Me.groupBox1.Size = New System.Drawing.Size(620, 162)
-        Me.groupBox1.TabIndex = 33
-        Me.groupBox1.TabStop = False
+        Me.initialSettingsGroup.BackColor = System.Drawing.Color.Transparent
+        Me.initialSettingsGroup.Controls.Add(Me.StatusLabel)
+        Me.initialSettingsGroup.Controls.Add(Me.subfolderSelection)
+        Me.initialSettingsGroup.Controls.Add(Me.baseDirectoryTextBox)
+        Me.initialSettingsGroup.Controls.Add(Me.animeUrl)
+        Me.initialSettingsGroup.Controls.Add(Me.animeName)
+        Me.initialSettingsGroup.Location = New System.Drawing.Point(5, 45)
+        Me.initialSettingsGroup.Name = "initialSettingsGroup"
+        Me.initialSettingsGroup.Size = New System.Drawing.Size(620, 162)
+        Me.initialSettingsGroup.TabIndex = 33
+        Me.initialSettingsGroup.TabStop = False
         '
         'StatusLabel
         '
@@ -78,113 +78,113 @@ Partial Class Anime_Add
         Me.StatusLabel.Text = "Status: idle"
         Me.StatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'ComboBox2
+        'subfolderSelection
         '
-        Me.ComboBox2.BackColor = System.Drawing.Color.White
-        Me.ComboBox2.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
-        Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox2.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBox2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.ComboBox2.FormattingEnabled = True
-        Me.ComboBox2.Location = New System.Drawing.Point(18, 98)
-        Me.ComboBox2.Name = "ComboBox2"
-        Me.ComboBox2.Size = New System.Drawing.Size(585, 23)
-        Me.ComboBox2.Sorted = True
-        Me.ComboBox2.TabIndex = 37
+        Me.subfolderSelection.BackColor = System.Drawing.Color.White
+        Me.subfolderSelection.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
+        Me.subfolderSelection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.subfolderSelection.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.subfolderSelection.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.subfolderSelection.FormattingEnabled = True
+        Me.subfolderSelection.Location = New System.Drawing.Point(18, 98)
+        Me.subfolderSelection.Name = "subfolderSelection"
+        Me.subfolderSelection.Size = New System.Drawing.Size(585, 23)
+        Me.subfolderSelection.Sorted = True
+        Me.subfolderSelection.TabIndex = 37
         '
-        'TextBox4
+        'baseDirectory
         '
-        Me.TextBox4.BackColor = System.Drawing.Color.White
-        Me.TextBox4.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.TextBox4.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox4.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.TextBox4.Location = New System.Drawing.Point(18, 70)
-        Me.TextBox4.Name = "TextBox4"
-        Me.TextBox4.ReadOnly = True
-        Me.TextBox4.Size = New System.Drawing.Size(585, 22)
-        Me.TextBox4.TabIndex = 36
-        Me.TextBox4.TabStop = False
-        Me.TextBox4.Text = "Main Directory"
-        Me.TextBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.baseDirectoryTextBox.BackColor = System.Drawing.Color.White
+        Me.baseDirectoryTextBox.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.baseDirectoryTextBox.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.baseDirectoryTextBox.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.baseDirectoryTextBox.Location = New System.Drawing.Point(18, 70)
+        Me.baseDirectoryTextBox.Name = "baseDirectory"
+        Me.baseDirectoryTextBox.ReadOnly = True
+        Me.baseDirectoryTextBox.Size = New System.Drawing.Size(585, 22)
+        Me.baseDirectoryTextBox.TabIndex = 36
+        Me.baseDirectoryTextBox.TabStop = False
+        Me.baseDirectoryTextBox.Text = "Main Directory"
+        Me.baseDirectoryTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'textBox1
+        'animeUrl
         '
-        Me.textBox1.BackColor = System.Drawing.Color.White
-        Me.textBox1.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.textBox1.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.textBox1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.textBox1.Location = New System.Drawing.Point(18, 14)
-        Me.textBox1.Name = "textBox1"
-        Me.textBox1.Size = New System.Drawing.Size(585, 22)
-        Me.textBox1.TabIndex = 4
-        Me.textBox1.TabStop = False
-        Me.textBox1.Text = "URL"
-        Me.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.animeUrl.BackColor = System.Drawing.Color.White
+        Me.animeUrl.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.animeUrl.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.animeUrl.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.animeUrl.Location = New System.Drawing.Point(18, 14)
+        Me.animeUrl.Name = "animeUrl"
+        Me.animeUrl.Size = New System.Drawing.Size(585, 22)
+        Me.animeUrl.TabIndex = 4
+        Me.animeUrl.TabStop = False
+        Me.animeUrl.Text = "URL"
+        Me.animeUrl.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'textBox2
+        'animeName
         '
-        Me.textBox2.BackColor = System.Drawing.Color.White
-        Me.textBox2.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.textBox2.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.textBox2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.textBox2.Location = New System.Drawing.Point(18, 42)
-        Me.textBox2.Name = "textBox2"
-        Me.textBox2.Size = New System.Drawing.Size(585, 22)
-        Me.textBox2.TabIndex = 5
-        Me.textBox2.TabStop = False
-        Me.textBox2.Text = "Name of the Anime"
-        Me.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.animeName.BackColor = System.Drawing.Color.White
+        Me.animeName.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.animeName.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.animeName.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.animeName.Location = New System.Drawing.Point(18, 42)
+        Me.animeName.Name = "animeName"
+        Me.animeName.Size = New System.Drawing.Size(585, 22)
+        Me.animeName.TabIndex = 5
+        Me.animeName.TabStop = False
+        Me.animeName.Text = "Name of the Anime"
+        Me.animeName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'pictureBox4
+        'downloadButton
         '
-        Me.pictureBox4.BackColor = System.Drawing.Color.Transparent
-        Me.pictureBox4.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pictureBox4.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.main_button_download_default
-        Me.pictureBox4.Location = New System.Drawing.Point(44, 213)
-        Me.pictureBox4.Name = "pictureBox4"
-        Me.pictureBox4.Size = New System.Drawing.Size(537, 50)
-        Me.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.pictureBox4.TabIndex = 42
-        Me.pictureBox4.TabStop = False
+        Me.downloadButton.BackColor = System.Drawing.Color.Transparent
+        Me.downloadButton.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.downloadButton.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.main_button_download_default
+        Me.downloadButton.Location = New System.Drawing.Point(44, 213)
+        Me.downloadButton.Name = "downloadButton"
+        Me.downloadButton.Size = New System.Drawing.Size(537, 50)
+        Me.downloadButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.downloadButton.TabIndex = 42
+        Me.downloadButton.TabStop = False
         '
-        'pictureBox3
+        'closeButton
         '
-        Me.pictureBox3.BackColor = System.Drawing.Color.Transparent
-        Me.pictureBox3.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.pictureBox3.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.main_close
-        Me.pictureBox3.Location = New System.Drawing.Point(579, 1)
-        Me.pictureBox3.Name = "pictureBox3"
-        Me.pictureBox3.Size = New System.Drawing.Size(50, 40)
-        Me.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
-        Me.pictureBox3.TabIndex = 43
-        Me.pictureBox3.TabStop = False
+        Me.closeButton.BackColor = System.Drawing.Color.Transparent
+        Me.closeButton.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.closeButton.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.main_close
+        Me.closeButton.Location = New System.Drawing.Point(579, 1)
+        Me.closeButton.Name = "closeButton"
+        Me.closeButton.Size = New System.Drawing.Size(50, 40)
+        Me.closeButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
+        Me.closeButton.TabIndex = 43
+        Me.closeButton.TabStop = False
         '
         'groupBox2
         '
-        Me.groupBox2.BackColor = System.Drawing.Color.Transparent
-        Me.groupBox2.Controls.Add(Me.PictureBox1)
-        Me.groupBox2.Controls.Add(Me.Add_Display)
-        Me.groupBox2.Controls.Add(Me.comboBox4)
-        Me.groupBox2.Controls.Add(Me.ComboBox1)
-        Me.groupBox2.Controls.Add(Me.comboBox3)
-        Me.groupBox2.Location = New System.Drawing.Point(5, 45)
-        Me.groupBox2.Name = "groupBox2"
-        Me.groupBox2.Size = New System.Drawing.Size(620, 162)
-        Me.groupBox2.TabIndex = 44
-        Me.groupBox2.TabStop = False
-        Me.groupBox2.Visible = False
+        Me.episodeSelectionGroup.BackColor = System.Drawing.Color.Transparent
+        Me.episodeSelectionGroup.Controls.Add(Me.cancelAddButton)
+        Me.episodeSelectionGroup.Controls.Add(Me.Add_Display)
+        Me.episodeSelectionGroup.Controls.Add(Me.lastEpisodeSelector)
+        Me.episodeSelectionGroup.Controls.Add(Me.seasonSelector)
+        Me.episodeSelectionGroup.Controls.Add(Me.firstEpisodeSelector)
+        Me.episodeSelectionGroup.Location = New System.Drawing.Point(5, 45)
+        Me.episodeSelectionGroup.Name = "episodeSelectionGroup"
+        Me.episodeSelectionGroup.Size = New System.Drawing.Size(620, 162)
+        Me.episodeSelectionGroup.TabIndex = 44
+        Me.episodeSelectionGroup.TabStop = False
+        Me.episodeSelectionGroup.Visible = False
         '
         'PictureBox1
         '
-        Me.PictureBox1.BackColor = System.Drawing.Color.Transparent
-        Me.PictureBox1.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.PictureBox1.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.add_mass_cancel
-        Me.PictureBox1.Location = New System.Drawing.Point(113, 117)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(403, 36)
-        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-        Me.PictureBox1.TabIndex = 45
-        Me.PictureBox1.TabStop = False
+        Me.cancelAddButton.BackColor = System.Drawing.Color.Transparent
+        Me.cancelAddButton.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.cancelAddButton.Image = Global.Crunchyroll_Downloader.My.Resources.Resources.add_mass_cancel
+        Me.cancelAddButton.Location = New System.Drawing.Point(113, 117)
+        Me.cancelAddButton.Name = "cancelAddButton"
+        Me.cancelAddButton.Size = New System.Drawing.Size(403, 36)
+        Me.cancelAddButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.cancelAddButton.TabIndex = 45
+        Me.cancelAddButton.TabStop = False
         '
         'Add_Display
         '
@@ -203,41 +203,41 @@ Partial Class Anime_Add
         '
         'comboBox4
         '
-        Me.comboBox4.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
-        Me.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.comboBox4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.comboBox4.FormattingEnabled = True
-        Me.comboBox4.Location = New System.Drawing.Point(24, 83)
-        Me.comboBox4.Name = "comboBox4"
-        Me.comboBox4.Size = New System.Drawing.Size(585, 23)
-        Me.comboBox4.TabIndex = 2
+        Me.lastEpisodeSelector.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
+        Me.lastEpisodeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.lastEpisodeSelector.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lastEpisodeSelector.FormattingEnabled = True
+        Me.lastEpisodeSelector.Location = New System.Drawing.Point(24, 83)
+        Me.lastEpisodeSelector.Name = "lastEpisodeSelector"
+        Me.lastEpisodeSelector.Size = New System.Drawing.Size(585, 23)
+        Me.lastEpisodeSelector.TabIndex = 2
         '
         'ComboBox1
         '
-        Me.ComboBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
-        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(24, 19)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(585, 23)
-        Me.ComboBox1.TabIndex = 1
+        Me.seasonSelector.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
+        Me.seasonSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.seasonSelector.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.seasonSelector.FormattingEnabled = True
+        Me.seasonSelector.Location = New System.Drawing.Point(24, 19)
+        Me.seasonSelector.Name = "seasonSelector"
+        Me.seasonSelector.Size = New System.Drawing.Size(585, 23)
+        Me.seasonSelector.TabIndex = 1
         '
         'comboBox3
         '
-        Me.comboBox3.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
-        Me.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.comboBox3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.comboBox3.FormattingEnabled = True
-        Me.comboBox3.Location = New System.Drawing.Point(24, 51)
-        Me.comboBox3.Name = "comboBox3"
-        Me.comboBox3.Size = New System.Drawing.Size(585, 23)
-        Me.comboBox3.TabIndex = 1
+        Me.firstEpisodeSelector.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
+        Me.firstEpisodeSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.firstEpisodeSelector.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.firstEpisodeSelector.FormattingEnabled = True
+        Me.firstEpisodeSelector.Location = New System.Drawing.Point(24, 51)
+        Me.firstEpisodeSelector.Name = "comboBox3"
+        Me.firstEpisodeSelector.Size = New System.Drawing.Size(585, 23)
+        Me.firstEpisodeSelector.TabIndex = 1
         '
         'GroupBox3
         '
         Me.GroupBox3.BackColor = System.Drawing.Color.Transparent
-        Me.GroupBox3.Controls.Add(Me.ListBox1)
+        Me.GroupBox3.Controls.Add(Me.animeQueue)
         Me.GroupBox3.Location = New System.Drawing.Point(5, 45)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(620, 162)
@@ -247,13 +247,13 @@ Partial Class Anime_Add
         '
         'ListBox1
         '
-        Me.ListBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(243, Byte), Integer), CType(CType(243, Byte), Integer), CType(CType(243, Byte), Integer))
-        Me.ListBox1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(3, 16)
-        Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(614, 143)
-        Me.ListBox1.TabIndex = 0
+        Me.animeQueue.BackColor = System.Drawing.Color.FromArgb(CType(CType(243, Byte), Integer), CType(CType(243, Byte), Integer), CType(CType(243, Byte), Integer))
+        Me.animeQueue.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.animeQueue.FormattingEnabled = True
+        Me.animeQueue.Location = New System.Drawing.Point(3, 16)
+        Me.animeQueue.Name = "animeQueue"
+        Me.animeQueue.Size = New System.Drawing.Size(614, 143)
+        Me.animeQueue.TabIndex = 0
         '
         'Timer1
         '
@@ -271,41 +271,41 @@ Partial Class Anime_Add
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackgroundImage = Global.Crunchyroll_Downloader.My.Resources.Resources.add_background
         Me.ClientSize = New System.Drawing.Size(630, 275)
-        Me.Controls.Add(Me.pictureBox3)
-        Me.Controls.Add(Me.pictureBox4)
-        Me.Controls.Add(Me.groupBox1)
+        Me.Controls.Add(Me.closeButton)
+        Me.Controls.Add(Me.downloadButton)
+        Me.Controls.Add(Me.initialSettingsGroup)
         Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.groupBox2)
+        Me.Controls.Add(Me.episodeSelectionGroup)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.Name = "Anime_Add"
         Me.Text = "Add"
-        Me.groupBox1.ResumeLayout(False)
-        Me.groupBox1.PerformLayout()
-        CType(Me.pictureBox4, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.pictureBox3, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.groupBox2.ResumeLayout(False)
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.initialSettingsGroup.ResumeLayout(False)
+        Me.initialSettingsGroup.PerformLayout()
+        CType(Me.downloadButton, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.closeButton, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.episodeSelectionGroup.ResumeLayout(False)
+        CType(Me.cancelAddButton, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox3.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Public WithEvents textBox1 As TextBox
-    Public WithEvents ComboBox2 As ComboBox
-    Public WithEvents TextBox4 As TextBox
-    Public WithEvents textBox2 As TextBox
-    Private WithEvents pictureBox3 As PictureBox
+    Public WithEvents animeUrl As TextBox
+    Public WithEvents subfolderSelection As ComboBox
+    Public WithEvents baseDirectoryTextBox As TextBox
+    Public WithEvents animeName As TextBox
+    Private WithEvents closeButton As PictureBox
     Public WithEvents StatusLabel As Label
     Public WithEvents Add_Display As Label
-    Public WithEvents comboBox4 As ComboBox
-    Public WithEvents ComboBox1 As ComboBox
-    Public WithEvents comboBox3 As ComboBox
-    Public WithEvents pictureBox4 As PictureBox
-    Public WithEvents groupBox2 As GroupBox
-    Public WithEvents PictureBox1 As PictureBox
-    Public WithEvents groupBox1 As GroupBox
+    Public WithEvents lastEpisodeSelector As ComboBox
+    Public WithEvents seasonSelector As ComboBox
+    Public WithEvents firstEpisodeSelector As ComboBox
+    Public WithEvents downloadButton As PictureBox
+    Public WithEvents episodeSelectionGroup As GroupBox
+    Public WithEvents cancelAddButton As PictureBox
+    Public WithEvents initialSettingsGroup As GroupBox
     Public WithEvents GroupBox3 As GroupBox
-    Friend WithEvents ListBox1 As ListBox
+    Friend WithEvents animeQueue As ListBox
     Friend WithEvents Timer1 As Timer
     Private WithEvents Timer2 As Timer
 End Class
