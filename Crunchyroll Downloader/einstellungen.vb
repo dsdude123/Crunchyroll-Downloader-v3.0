@@ -7,6 +7,13 @@ Imports Crunchyroll_Downloader.Common
 
 Public Class einstellungen
     Private Sub einstellungen_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ComboBox1.ValueMember = "shortString"
+        ComboBox1.DisplayMember = "fullText"
+        ComboBox1.DataSource = supportedHardSubs
+        ComboBox1.BindingContext = Me.BindingContext
+
+        ComboBox1.SelectedValue = Main.SubSprache
+
         ToolTip1.SetToolTip(CB_Login, My.Resources.US_ToolTip)
         For i As Integer = 0 To Main.SoftSubs.Count - 1
             If Main.SoftSubs(i) = "deDE" Then
@@ -63,31 +70,6 @@ Public Class einstellungen
             AAuto.Checked = True
         End If
 
-        If Check_CB() = False Then
-            ComboBox1.Items.Add(Main.CB_SuB_Nothing)
-        End If
-        If Main.SubSprache = "deDE" Then
-            ComboBox1.SelectedItem = "Deutsch"
-        ElseIf Main.SubSprache = "enUS" Then
-            ComboBox1.SelectedItem = "English"
-        ElseIf Main.SubSprache = "ptBR" Then
-            ComboBox1.SelectedItem = "Português (Brasil)"
-        ElseIf Main.SubSprache = "esLA" Then
-            ComboBox1.SelectedItem = "Español (LA)"
-        ElseIf Main.SubSprache = "frFR" Then
-            ComboBox1.SelectedItem = "Français (France)"
-        ElseIf Main.SubSprache = "arME" Then
-            ComboBox1.SelectedItem = "العربية (Arabic)"
-        ElseIf Main.SubSprache = "ruRU" Then
-            ComboBox1.SelectedItem = "Русский (Russian)"
-        ElseIf Main.SubSprache = "itIT" Then
-            ComboBox1.SelectedItem = "Italiano (Italian)"
-        ElseIf Main.SubSprache = "esES" Then
-            ComboBox1.SelectedItem = "Español (España)"
-        Else
-            ComboBox1.SelectedItem = Main.CB_SuB_Nothing
-        End If
-
         If Main.SubFolder = 1 Then
             RBAnime.Checked = True
         ElseIf Main.SubFolder = 2 Then
@@ -106,115 +88,37 @@ Public Class einstellungen
             FFMPEG_CommandP3.Text = ffmpegDisplayCurrent(4) + " " + ffmpegDisplayCurrent(5)
         End If
 
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            Firefox_True.Checked = CBool(Integer.Parse(rkg.GetValue("NoUse").ToString))
-            'MsgBox(Resu)
-        Catch ex As Exception
-        End Try
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            ListViewAdd_True.Checked = CBool(Integer.Parse(rkg.GetValue("QueueMode").ToString))
-        Catch ex As Exception
-        End Try
+        Firefox_True.Checked = CBool(GetRegistryValue("NoUse"))
+        ListViewAdd_True.Checked = CBool(GetRegistryValue("QueueMode"))
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles pictureBox4.Click
-        Dim rk As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-        If InStr(TextBox1.Text, "https://") Then
-            Main.Startseite = TextBox1.Text
-            rk.SetValue("Startseite", Main.Startseite, RegistryValueKind.String)
-        ElseIf TextBox1.Text = Nothing Then
+
+        Dim isValidUri = Uri.IsWellFormedUriString(TextBox1.Text, UriKind.Absolute) And (TextBox1.Text.StartsWith("http") Or TextBox1.Text.StartsWith("https"))
+
+        If (isValidUri = False) Then
             Main.Startseite = "https://www.crunchyroll.com/"
-            rk.SetValue("Startseite", Main.Startseite, RegistryValueKind.String)
         Else
-
+            Main.Startseite = TextBox1.Text
         End If
-        If A1080p.Checked Then
-            Main.Resu = 1080
-            rk.SetValue("Resu", 1080, RegistryValueKind.String)
-        ElseIf A720p.Checked Then
-            Main.Resu = 720
-            rk.SetValue("Resu", 720, RegistryValueKind.String)
-        ElseIf A360p.Checked Then
-            Main.Resu = 360
-            rk.SetValue("Resu", 360, RegistryValueKind.String)
-        ElseIf A480p.Checked Then
-            Main.Resu = 480
-            rk.SetValue("Resu", 480, RegistryValueKind.String)
-        ElseIf AAuto.Checked Then
-            Main.Resu = 42
-            rk.SetValue("Resu", 42, RegistryValueKind.String)
-        End If
-        If ComboBox1.SelectedItem.ToString = "English" Then
-            Main.SubSprache = "enUS"
-            rk.SetValue("Sub", "enUS", RegistryValueKind.String)
 
-        ElseIf ComboBox1.SelectedItem.ToString = "Deutsch" Then
-            Main.SubSprache = "deDE"
-            rk.SetValue("Sub", "deDE", RegistryValueKind.String)
+        Dim resolutionSelected = (From rb As RadioButton In GB_Resolution.Controls Where rb.Checked Select rb).SingleOrDefault()
+        Main.Resu = Integer.Parse(resolutionSelected.Tag.ToString)
+        SetRegistryValue("Resu", Main.Resu, RegistryValueKind.DWord)
 
-        ElseIf ComboBox1.SelectedItem.ToString = "Português (Brasil)" Then
-            Main.SubSprache = "ptBR"
-            rk.SetValue("Sub", "ptBR", RegistryValueKind.String)
+        Main.SubSprache = CType(ComboBox1.SelectedItem, LanguageMapping).shortString
+        SetRegistryValue("Sub", Main.SubSprache, RegistryValueKind.String)
 
-        ElseIf ComboBox1.SelectedItem.ToString = "Español (LA)" Then
-            Main.SubSprache = "esLA"
-            rk.SetValue("Sub", "esLA", RegistryValueKind.String)
+        Main.MergeSubstoMP4 = MergeMP4.Checked
+        Main.LoginDialog = CB_Login.Checked
+        Main.SaveLog = CB_Log.Checked
+        Main.SubFolder = Convert.ToInt32(RBAnime.Checked) + 1
 
-        ElseIf ComboBox1.SelectedItem.ToString = "Français (France)" Then
-            Main.SubSprache = "frFR"
-            rk.SetValue("Sub", "frFR", RegistryValueKind.String)
+        SetRegistryValue("MergeMP4", Convert.ToInt32(Main.MergeSubstoMP4), RegistryValueKind.DWord)
+        SetRegistryValue("LoginDialog", Convert.ToInt32(Main.LoginDialog), RegistryValueKind.DWord)
+        SetRegistryValue("SaveLog", Convert.ToInt32(Main.SaveLog), RegistryValueKind.DWord)
+        SetRegistryValue("SubFolder", Main.SubFolder, RegistryValueKind.DWord)
 
-        ElseIf ComboBox1.SelectedItem.ToString = "العربية (Arabic)" Then
-            Main.SubSprache = "arME"
-            rk.SetValue("Sub", "arME", RegistryValueKind.String)
-
-        ElseIf ComboBox1.SelectedItem.ToString = "Русский (Russian)" Then
-            Main.SubSprache = "ruRU"
-            rk.SetValue("Sub", "ruRU", RegistryValueKind.String)
-
-        ElseIf ComboBox1.SelectedItem.ToString = "Italiano (Italian)" Then
-            Main.SubSprache = "itIT"
-            rk.SetValue("Sub", "itIT", RegistryValueKind.String)
-
-        ElseIf ComboBox1.SelectedItem.ToString = "Español (España)" Then
-            Main.SubSprache = "esES"
-            rk.SetValue("Sub", "esES", RegistryValueKind.String)
-
-        ElseIf ComboBox1.SelectedItem.ToString = Main.CB_SuB_Nothing Then
-            Main.SubSprache = "None"
-            rk.SetValue("Sub", "None", RegistryValueKind.String)
-
-        End If
-        If MergeMP4.Checked = True Then
-            Main.MergeSubstoMP4 = True
-            rk.SetValue("MergeMP4", "1", RegistryValueKind.String)
-        Else
-            Main.MergeSubstoMP4 = False
-            rk.SetValue("MergeMP4", "0", RegistryValueKind.String)
-        End If
-        If CB_Login.Checked = True Then
-            Main.LoginDialog = True
-            rk.SetValue("LoginDialog", "1", RegistryValueKind.String)
-        Else
-            Main.LoginDialog = False
-            rk.SetValue("LoginDialog", "0", RegistryValueKind.String)
-        End If
-        If CB_Log.Checked = True Then
-            Main.SaveLog = True
-            rk.SetValue("SaveLog", "1", RegistryValueKind.String)
-        Else
-            Main.SaveLog = False
-            rk.SetValue("SaveLog", "0", RegistryValueKind.String)
-        End If
-        If RBAnime.Checked = True Then
-            Main.SubFolder = 1
-            rk.SetValue("SubFolder", 1, RegistryValueKind.String)
-        ElseIf RBStaffel.Checked = True Then
-            Main.SubFolder = 2
-            rk.SetValue("SubFolder", 2, RegistryValueKind.String)
-        End If
         If CheckBox1.Enabled = False Then
 
         Else
@@ -226,7 +130,7 @@ Public Class einstellungen
                 ffpmeg_cmd = " " + FFMPEG_CommandP1.Text + " " + FFMPEG_CommandP2.Text + " " + FFMPEG_CommandP3.Text + " " + FFMPEG_CommandP4.Text
 
             End If
-            rk.SetValue("ffmpeg_command", ffpmeg_cmd, RegistryValueKind.String)
+            SetRegistryValue("ffmpeg_command", ffpmeg_cmd, RegistryValueKind.String)
             Main.ffmpeg_command = ffpmeg_cmd
         End If
 
@@ -235,20 +139,13 @@ Public Class einstellungen
         ElseIf InStr(FFMPEG_CommandP1.Text, "libx26") Then
             NumericUpDown1.Value = 1
         End If
-        rk.SetValue("SL_DL", NumericUpDown1.Value, RegistryValueKind.String)
+        SetRegistryValue("SL_DL", NumericUpDown1.Value, RegistryValueKind.DWord)
         Main.MaxDL = NumericUpDown1.Value
-        If Firefox_True.Checked = True Then
-            rk.SetValue("NoUse", 1, RegistryValueKind.String)
-        ElseIf Firefox_True.Checked = False Then
-            rk.SetValue("NoUse", 0, RegistryValueKind.String)
-        End If
 
-        If ListViewAdd_True.Checked = True Then
-            rk.SetValue("QueueMode", 1, RegistryValueKind.String)
-
-        ElseIf ListViewAdd_True.Checked = False Then
-            rk.SetValue("QueueMode", 0, RegistryValueKind.String)
-            Main.UseQueue = False
+        SetRegistryValue("NoUse", Convert.ToInt32(Firefox_True.Checked), RegistryValueKind.DWord)
+        SetRegistryValue("QueueMode", Convert.ToInt32(ListViewAdd_True.Checked), RegistryValueKind.DWord)
+        If (ListViewAdd_True.Checked = False) Then
+            Main.UseQueue = False 'TODO: Determine why this isn't set to truw here
         End If
 
 #Region "sof subs"
@@ -281,18 +178,7 @@ Public Class einstellungen
             Main.SoftSubs.Add("esES")
         End If
 
-        Dim SaveString As String = Nothing
-        For ii As Integer = 0 To Main.SoftSubs.Count - 1
-            If SaveString = Nothing Then
-                SaveString = Main.SoftSubs(ii)
-            Else
-                SaveString = SaveString + "," + Main.SoftSubs(ii)
-            End If
-        Next
-        If SaveString = Nothing Then
-            SaveString = "none"
-        End If
-        rk.SetValue("AddedSubs", SaveString, RegistryValueKind.String)
+        SetRegistryValue("AddedSubs", Main.SoftSubs.ToArray, RegistryValueKind.MultiString)
 #End Region
         Me.Close()
     End Sub
@@ -300,19 +186,6 @@ Public Class einstellungen
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         System.Diagnostics.Process.Start("https://www.youtube.com/user/hama3254")
     End Sub
-
-    Private Function Check_CB() As Boolean
-        Dim C As Boolean = False
-        For i As Integer = 0 To ComboBox1.Items.Count - 1
-            If ComboBox1.Items.Item(i).ToString = Main.CB_SuB_Nothing Then
-                C = True
-                Exit For
-            End If
-        Next
-        Return C
-    End Function
-
-
 
     Private Function GeräteID() As String
         Dim rnd As New Random

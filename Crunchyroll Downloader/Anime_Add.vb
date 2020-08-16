@@ -7,11 +7,9 @@ Public Class Anime_Add
     Public Mass_DL_Cancel As Boolean = False
     Public List_DL_Cancel As Boolean = False
 
-    Private registryKey As RegistryKey = Registry.CurrentUser.CreateSubKey("Software\CRDownloader")
-
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles subfolderSelection.SelectedIndexChanged
         Try
-            registryKey.SetValue("SubFolder_Value", subfolderSelection.Text, RegistryValueKind.String)
+            SetRegistryValue("SubFolder_Value", subfolderSelection.Text, RegistryValueKind.String)
         Catch ex As Exception
             subfolderSelection.Text = Main.SubFolder_Nothing
         End Try
@@ -39,16 +37,16 @@ Public Class Anime_Add
 
         subfolderSelection.Items.Add(Main.SubFolder_automatic)
         subfolderSelection.Items.Add(Main.SubFolder_Nothing)
-        Try
-            SubFolder_Value = registryKey.GetValue("SubFolder_Value").ToString
 
-            If (SubFolder_Value IsNot Main.SubFolder_Nothing) And (SubFolder_Value IsNot Main.SubFolder_automatic) Then
-                subfolderSelection.Items.Add(SubFolder_Value)
-            End If
-        Catch ex As Exception
+        SubFolder_Value = GetRegistryValue("SubFolder_Value")
+
+        If (SubFolder_Value IsNot Nothing) And (SubFolder_Value IsNot Main.SubFolder_Nothing) And (SubFolder_Value IsNot Main.SubFolder_automatic) Then
+            subfolderSelection.Items.Add(SubFolder_Value)
+        Else
             subfolderSelection.SelectedItem = Main.SubFolder_Nothing
             SubFolder_Value = Main.SubFolder_Nothing
-        End Try
+        End If
+
 
         Try
             For Each subDirectory In Main.baseDirectory.EnumerateDirectories("*.*", System.IO.SearchOption.TopDirectoryOnly)
@@ -80,7 +78,7 @@ Public Class Anime_Add
         If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
             subfolderSelection.Items.Clear()
             Main.baseDirectory = FolderBrowserDialog1.SelectedPath
-            registryKey.SetValue("Ordner", Main.baseDirectory, RegistryValueKind.String)
+            SetRegistryValue("Ordner", Main.baseDirectory, RegistryValueKind.String)
 
             subfolderSelection.Items.Add(Main.SubFolder_automatic)
             subfolderSelection.Items.Add(Main.SubFolder_Nothing)

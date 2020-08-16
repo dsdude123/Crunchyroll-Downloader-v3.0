@@ -46,7 +46,6 @@ Public Class Main
     Public SoftSubs As New List(Of String)
     Public AbourtList As New List(Of String)
     Public watingList As New List(Of String)
-    Dim SoftSubsString As String
     Dim CR_Unlock_Error As String
     Public Startseite As String = "https://www.crunchyroll.com/"
     Dim SubSprache2 As String
@@ -151,6 +150,8 @@ Public Class Main
             Me.Close()
         End If
 
+        MigrateStringsToDWords() 'Update old registry data types
+
         waveOutSetVolume(0, 0)
         Try
             Dim FileLocation As DirectoryInfo = New DirectoryInfo(Application.StartupPath)
@@ -167,105 +168,39 @@ Public Class Main
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
         Me.Icon = My.Resources.icon
 
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            baseDirectory = rkg.GetValue("Ordner").ToString
-        Catch ex As Exception
 
-        End Try
+        baseDirectory = GetRegistryValue("Ordner")
+        Startseite = GetRegistryValue("Startseite")
+        UseQueue = CBool(GetRegistryValue("QueueMode"))
+        Resu = GetRegistryValue("Resu")
+        SubSprache = GetRegistryValue("Sub")
+        MergeSubstoMP4 = CBool(GetRegistryValue("MergeMP4"))
+        SaveLog = CBool(GetRegistryValue("SaveLog"))
+        Dim softSubsArray() As String = GetRegistryValue("AddedSubs")
+        SoftSubs = softSubsArray.ToList
 
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            Startseite = rkg.GetValue("Startseite").ToString
-        Catch ex As Exception
+        If SoftSubs Is Nothing Then
+            SoftSubs = New List(Of String)
+        End If
 
-        End Try
-#Region "Startup IU"
-        StatusToolTip.Active = True
-#End Region
-
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            UseQueue = CBool(Integer.Parse(rkg.GetValue("QueueMode").ToString))
-        Catch ex As Exception
-
-        End Try
-
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            ffmpeg_command = rkg.GetValue("ffmpeg_command").ToString
-        Catch ex As Exception
+        ffmpeg_command = GetRegistryValue("ffmpeg_command")
+        If ffmpeg_command Is Nothing Then
             ffmpeg_command = " -c copy -bsf:a aac_adtstoasc "
-        End Try
-
-        If ffmpeg_command = " -c:v hevc_nvenc -preset fast -b:v 6M -bsf:a aac_adtstoasc " Then
+        ElseIf ffmpeg_command = " -c:v hevc_nvenc -preset fast -b:v 6M -bsf:a aac_adtstoasc " Then
             MaxDL = 2
         ElseIf ffmpeg_command = " -c:v libx265 -preset fast -b:v 6M -bsf:a aac_adtstoasc " Then
             MaxDL = 1
         End If
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            Resu = Integer.Parse(rkg.GetValue("Resu").ToString)
-            'MsgBox(Resu)
-        Catch ex As Exception
-        End Try
 
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SubSprache = rkg.GetValue("Sub").ToString
-        Catch ex As Exception
-        End Try
-
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SubFolder = Integer.Parse(rkg.GetValue("SubFolder").ToString)
-        Catch ex As Exception
+        SubFolder = GetRegistryValue("SubFolder")
+        If SubFolder = Nothing Then
             SubFolder = 1
-        End Try
+        End If
 
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            MaxDL = Integer.Parse(rkg.GetValue("SL_DL").ToString)
-
-
-        Catch ex As Exception
+        MaxDL = GetRegistryValue("SL_DL")
+        If MaxDL = Nothing Then
             MaxDL = 1
-        End Try
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            MergeSubstoMP4 = CBool(Integer.Parse(rkg.GetValue("MergeMP4").ToString))
-        Catch ex As Exception
-
-        End Try
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SaveLog = CBool(Integer.Parse(rkg.GetValue("SaveLog").ToString))
-        Catch ex As Exception
-
-        End Try
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SaveLog = CBool(Integer.Parse(rkg.GetValue("SaveLog").ToString))
-        Catch ex As Exception
-
-        End Try
-#Region "removed softsubtitle"
-
-        Try
-            Dim rkg As RegistryKey = Registry.CurrentUser.OpenSubKey("Software\CRDownloader")
-            SoftSubsString = rkg.GetValue("AddedSubs").ToString
-            If SoftSubsString = "none" Then
-
-            Else
-                Dim SoftSubsStringSplit() As String = SoftSubsString.Split(New String() {","}, System.StringSplitOptions.RemoveEmptyEntries)
-                For i As Integer = 0 To SoftSubsStringSplit.Count - 1
-                    SoftSubs.Add(SoftSubsStringSplit(i))
-                Next
-            End If
-        Catch ex As Exception
-        End Try
-
-#End Region
+        End If
 
         If Resu = Nothing Then
             Resu = 1080
@@ -1471,6 +1406,14 @@ Public Class Main
                     Dim Request As HttpWebRequest = CType(WebRequest.Create("https://docs.google.com/forms/d/e/1FAIpQLSdR1QI19Lh-c-XO_iXNkDwsTUZhCMEu84boQkgW5AOBUxyiyA/formResponse"), HttpWebRequest)
                     Request.Method = "POST"
                     Request.ContentType = "application/x-www-form-urlencoded"
+                    Dim SoftSubsString = "none"
+                    If SoftSubs.Count > 0 Then
+                        SoftSubsString = ""
+                        For Each softSub As String In SoftSubs
+                            SoftSubsString = SoftSubsString + softSub + ","
+                        Next
+                        SoftSubsString.Remove(SoftSubsString.Length - 1, 1)
+                    End If
                     Dim Post As String = "entry.240217066=" + My.Computer.Info.OSFullName + "&entry.358200455=" + WebbrowserURL + "&entry.618751432=" + SubSprache + "&entry.924054550=" + Resu.ToString + "&entry.679000538=" + ex.ToString + "&entry.1789515979=" + SoftSubsString + "&entry.683247287=" + Application.ProductVersion + "&entry.377264428=" + CCC1(0) + "&fvv=1&draftResponse=[null,null," + Chr(34) + "-3005021683493723280" + Chr(34) + "] &pageHistory=0&fbzx=-3005021683493723280"
                     Dim byteArray() As Byte = Encoding.UTF8.GetBytes(Post)
                     Request.ContentLength = byteArray.Length
